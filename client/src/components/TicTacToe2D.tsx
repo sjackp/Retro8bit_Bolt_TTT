@@ -51,26 +51,26 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
     const isEmpty = !cellData.piece;
     
     let cellContent = "";
-    let cellClass = "w-24 h-24 border-2 flex items-center justify-center text-4xl font-bold font-mono cursor-pointer transition-all duration-200 relative overflow-hidden rounded-lg";
+    let cellClass = "w-24 h-24 border-4 flex items-center justify-center text-4xl font-bold pixel-font cursor-pointer transition-all duration-200 relative overflow-hidden";
     
     if (isEmpty) {
-      cellClass += " border-purple-400/50 hover:border-purple-400 hover:bg-purple-400/10 hover:shadow-lg hover:shadow-purple-400/30 hover:scale-105";
+      cellClass += " border-green-400 hover:border-yellow-400 hover:bg-green-400/20 hover:animate-retro-glow";
     } else {
       cellClass += " cursor-default";
     }
 
     if (cellData.piece === 'X') {
       cellContent = "X";
-      cellClass += " text-pink-400 border-pink-400 bg-pink-400/20 shadow-lg shadow-pink-400/50";
+      cellClass += " text-white bg-red-600 border-red-700";
     } else if (cellData.piece === 'O') {
       cellContent = "O";
-      cellClass += " text-cyan-400 border-cyan-400 bg-cyan-400/20 shadow-lg shadow-cyan-400/50";
+      cellClass += " text-white bg-blue-600 border-blue-700";
     }
 
     // Apply animations
     let opacity = 1 - cellData.fadeProgress;
     if (cellData.isBlinking) {
-      cellClass += " animate-pulse border-yellow-400 bg-yellow-400/20 shadow-lg shadow-yellow-400/50";
+      cellClass += " animate-pixel-blink border-yellow-400 bg-yellow-400";
     }
 
     const cellStyle = {
@@ -208,24 +208,24 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
       </div>
 
       {/* Score Display */}
-      <Card className="bg-black/90 backdrop-blur-sm border-2 border-purple-500 shadow-lg shadow-purple-500/50 mb-8 relative z-10">
+      <Card className="bg-black border-4 border-green-500 shadow-lg mb-8 relative z-10">
         <CardContent className="pt-4">
           <div className="flex gap-4 text-center justify-center">
-            <div className="p-4 rounded-lg bg-gradient-to-b from-pink-500/20 to-pink-600/20 border border-pink-400">
-              <div className="text-3xl font-bold text-pink-400 font-mono">{playerScores.X}</div>
-              <div className="text-sm text-pink-300 font-mono">{isAIMode ? "YOU (X)" : "PLAYER X"}</div>
+            <div className="p-4 bg-red-600 border-4 border-red-700">
+              <div className="text-3xl font-bold text-white pixel-font">{playerScores.X}</div>
+              <div className="text-sm text-white pixel-font">{isAIMode ? "YOU" : "P1"}</div>
             </div>
-            <div className="text-2xl text-purple-400 font-mono self-center">VS</div>
-            <div className="p-4 rounded-lg bg-gradient-to-b from-cyan-500/20 to-cyan-600/20 border border-cyan-400">
-              <div className="text-3xl font-bold text-cyan-400 font-mono">{playerScores.O}</div>
-              <div className="text-sm text-cyan-300 font-mono">{isAIMode ? "AI (O)" : "PLAYER O"}</div>
+            <div className="text-2xl text-green-400 pixel-font self-center animate-retro-glow">VS</div>
+            <div className="p-4 bg-blue-600 border-4 border-blue-700">
+              <div className="text-3xl font-bold text-white pixel-font">{playerScores.O}</div>
+              <div className="text-sm text-white pixel-font">{isAIMode ? "CPU" : "P2"}</div>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Game Board */}
-      <div className="grid grid-cols-3 gap-3 p-6 bg-black/90 backdrop-blur-sm rounded-lg border-2 border-purple-500 shadow-lg shadow-purple-500/50 mb-8 relative z-10">
+      <div className="grid grid-cols-3 gap-4 p-6 bg-black border-4 border-green-500 shadow-lg mb-8 relative z-10">
         {[0, 1, 2].map(row => (
           [0, 1, 2].map(col => renderCell(row, col))
         ))}
