@@ -118,6 +118,11 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
         return;
       }
       
+      // In multiplayer mode, check if it's the player's turn and they're playing as the current player
+      if (state.isMultiplayerMode && (!state.isMyTurn || state.currentPlayer !== state.myPlayer)) {
+        return;
+      }
+      
       const { playHit, playSuccess } = useAudio.getState();
       
       set((state) => {
@@ -265,6 +270,120 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
       set({
         isAIMode: enabled,
         isAIThinking: false
+      });
+    },
+    
+    setMultiplayerMode: (enabled: boolean, isHost: boolean) => {
+      set({
+        isMultiplayerMode: enabled,
+        myPlayer: isHost ? 'X' : 'O',
+        isMyTurn: isHost, // Host goes first
+        opponentConnected: false
+      });
+    },
+    
+    setOpponentConnected: (connected: boolean) => {
+      set({ opponentConnected: connected });
+    },
+    
+    setMyTurn: (isMyTurn: boolean) => {
+      set({ isMyTurn });
+    },
+    
+    handleOpponentMove: (row: number, col: number) => {
+      const state = get();
+      if (state.gamePhase !== 'playing' || state.grid[row][col].piece) {
+        return;
+      }
+      
+      // Force the move for the opponent
+      set((state) => {
+        const newGrid = [...state.grid.map(row => [...row])];
+        const newPieceQueue = [...state.pieceQueue];
+        let newTotalPieces = state.totalPieces + 1;
+        const currentOrder = state.placementOrder;
+        
+        // Place the opponent's piece
+        newGrid[row][col] = {
+          piece: state.currentPlayer,
+          placementOrder: currentOrder,
+          isBlinking: false,
+          fadeProgress: 0
+        };
+        
+        newPieceQueue.push({
+          row, col,
+          player: state.currentPlayer,
+          order: currentOrder
+        });
+        
+        // Handle piece removal if needed
+        if (newTotalPieces > 5) {
+          const oldestPiece = newPieceQueue.shift();
+          if (oldestPiece) {
+            newGrid[oldestPiece.row][oldestPiece.col].isBlinking = true;
+            
+            setTimeout(() => {
+              set((currentState) => {
+                const fadeGrid = [...currentState.grid.map(row => [...row])];
+                const cellToFade = fadeGrid[oldestPiece.row][oldestPiece.col];
+                
+                const startTime = performance.now();
+                const fadeAnimation = () => {
+                  const elapsed = performance.now() - startTime;
+                  const progress = Math.min(elapsed / 1000, 1);
+                  
+                  cellToFade.fadeProgress = progress;
+                  cellToFade.isBlinking = false;
+                  
+                  if (progress < 1) {
+                    requestAnimationFrame(fadeAnimation);
+                  } else {
+                    set((finalState) => {
+                      const finalGrid = [...finalState.grid.map(row => [...row])];
+                      finalGrid[oldestPiece.row][oldestPiece.col] = {
+                        piece: null,
+                        placementOrder: 0,
+                        isBlinking: false,
+                        fadeProgress: 0
+                      };
+                      
+                      return {
+                        grid: finalGrid,
+                        totalPieces: finalState.totalPieces - 1
+                      };
+                    });
+                  }
+                };
+                fadeAnimation();
+                
+                return { grid: fadeGrid };
+              });
+            }, 1500);
+          }
+        }
+        
+        // Check for winner
+        const winner = checkWinner(newGrid);
+        let newGamePhase = state.gamePhase;
+        let newPlayerScores = { ...state.playerScores };
+        
+        if (winner) {
+          newGamePhase = 'ended';
+          newPlayerScores[winner]++;
+        }
+        
+        return {
+          grid: newGrid,
+          currentPlayer: winner ? state.currentPlayer : (state.currentPlayer === 'X' ? 'O' : 'X'),
+          winner,
+          gamePhase: newGamePhase,
+          playerScores: newPlayerScores,
+          totalPieces: newTotalPieces,
+          pieceQueue: newPieceQueue,
+          placementOrder: currentOrder + 1,
+          isMyTurn: !state.isMyTurn // Switch turns
+        };
       });
     }
   }))
