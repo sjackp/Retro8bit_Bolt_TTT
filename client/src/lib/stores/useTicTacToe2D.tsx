@@ -59,13 +59,24 @@ const createEmptyGrid = (): GameGrid => {
   return grid;
 };
 
-// Check for winner in 2D
+// Check for winner in 2D with detailed logging
 const checkWinner = (grid: GameGrid): 'X' | 'O' | null => {
+  console.log("=== CHECKING FOR WINNER ===");
+  
+  // Print current board state
+  console.log("Current board:");
+  for (let row = 0; row < 3; row++) {
+    const rowStr = `Row ${row}: [${grid[row][0].piece || '_'}, ${grid[row][1].piece || '_'}, ${grid[row][2].piece || '_'}]`;
+    console.log(rowStr);
+  }
+  
   // Check rows
   for (let row = 0; row < 3; row++) {
     if (grid[row][0].piece && 
         grid[row][0].piece === grid[row][1].piece && 
         grid[row][1].piece === grid[row][2].piece) {
+      console.log(`🏆 ROW WIN DETECTED: Row ${row} - ${grid[row][0].piece} wins!`);
+      console.log(`Winning positions: (${row},0), (${row},1), (${row},2)`);
       return grid[row][0].piece;
     }
   }
@@ -75,23 +86,31 @@ const checkWinner = (grid: GameGrid): 'X' | 'O' | null => {
     if (grid[0][col].piece && 
         grid[0][col].piece === grid[1][col].piece && 
         grid[1][col].piece === grid[2][col].piece) {
+      console.log(`🏆 COLUMN WIN DETECTED: Column ${col} - ${grid[0][col].piece} wins!`);
+      console.log(`Winning positions: (0,${col}), (1,${col}), (2,${col})`);
       return grid[0][col].piece;
     }
   }
   
-  // Check diagonals
+  // Check main diagonal (top-left to bottom-right)
   if (grid[0][0].piece && 
       grid[0][0].piece === grid[1][1].piece && 
       grid[1][1].piece === grid[2][2].piece) {
+    console.log(`🏆 DIAGONAL WIN DETECTED: Main diagonal - ${grid[0][0].piece} wins!`);
+    console.log(`Winning positions: (0,0), (1,1), (2,2)`);
     return grid[0][0].piece;
   }
   
+  // Check anti-diagonal (top-right to bottom-left)
   if (grid[0][2].piece && 
       grid[0][2].piece === grid[1][1].piece && 
       grid[1][1].piece === grid[2][0].piece) {
+    console.log(`🏆 ANTI-DIAGONAL WIN DETECTED: Anti-diagonal - ${grid[0][2].piece} wins!`);
+    console.log(`Winning positions: (0,2), (1,1), (2,0)`);
     return grid[0][2].piece;
   }
   
+  console.log("❌ No winner detected");
   return null;
 };
 
@@ -136,6 +155,10 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
       const { playHit, playSuccess } = useAudio.getState();
       
       set((state) => {
+        console.log(`\n🎯 PLACING PIECE: ${state.currentPlayer} at (${row}, ${col})`);
+        console.log(`📊 Current pieces on board: ${state.totalPieces}`);
+        console.log(`📋 Piece queue length: ${state.pieceQueue.length}`);
+        
         const newGrid = [...state.grid.map(row => [...row])];
         const newPieceQueue = [...state.pieceQueue];
         let newTotalPieces = state.totalPieces + 1;
@@ -149,6 +172,8 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
           fadeProgress: 0
         };
         
+        console.log(`✅ Placed ${state.currentPlayer} piece at (${row}, ${col}) with order ${currentOrder}`);
+        
         // Add to queue
         newPieceQueue.push({
           row, col,
@@ -159,6 +184,8 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
         // Check if total pieces exceed 5 - remove the oldest piece on the board
         if (newPieceQueue.length > 5) {
           const oldestPiece = newPieceQueue[0]; // Get the oldest piece on the board
+          console.log(`🗑️ REMOVING OLDEST PIECE: ${oldestPiece.player} at (${oldestPiece.row}, ${oldestPiece.col}) with order ${oldestPiece.order}`);
+          
           const oldestPieceIndex = newPieceQueue.findIndex(p => 
             p.row === oldestPiece.row && 
             p.col === oldestPiece.col && 
@@ -167,6 +194,7 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
           
           if (oldestPieceIndex !== -1) {
             newPieceQueue.splice(oldestPieceIndex, 1); // Remove from queue
+            console.log(`✅ Removed piece from queue. New queue length: ${newPieceQueue.length}`);
             
             // Start fade animation immediately (piece was already blinking)
             setTimeout(() => {
@@ -216,18 +244,23 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
         let newGamePhase = state.gamePhase;
         let newPlayerScores = { ...state.playerScores };
         
+        console.log(`🔍 WIN CHECK: Queue length = ${newPieceQueue.length}, Total pieces = ${newTotalPieces}`);
+        
         // Only check for winner if no pieces are being removed (legitimate win)
         if (newPieceQueue.length <= 5) {
+          console.log("✅ Checking for winner (no piece removal happening)");
           winner = checkWinner(newGrid);
           if (winner) {
+            console.log(`🎉 GAME OVER: ${winner} wins!`);
             newGamePhase = 'ended';
             newPlayerScores[winner]++;
             playSuccess();
           } else {
+            console.log("🎯 No winner, continuing game");
             playHit();
           }
         } else {
-          // If pieces are being removed, don't check for winner to prevent false wins
+          console.log("⚠️ Skipping win check due to piece removal in progress");
           playHit();
         }
         
