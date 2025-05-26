@@ -149,7 +149,7 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
     const isEmpty = !cellData.piece;
     
     let cellContent = "";
-    let cellClass = "w-24 h-24 border-4 flex items-center justify-center text-4xl font-bold pixel-font cursor-pointer transition-all duration-200 relative overflow-hidden text-center leading-none";
+    let cellClass = "w-24 h-24 border-4 flex items-center justify-center text-5xl font-bold cursor-pointer transition-all duration-200 relative overflow-hidden";
     
     if (isEmpty) {
       cellClass += " border-orange-400 hover:border-yellow-400 hover:bg-orange-400/20 hover:animate-retro-glow";
@@ -158,11 +158,11 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
     }
 
     if (cellData.piece === 'X') {
-      cellContent = "✕";
-      cellClass += " text-white bg-orange-500 border-orange-600";
+      cellContent = "X";
+      cellClass += " text-white bg-orange-500 border-orange-600 font-mono";
     } else if (cellData.piece === 'O') {
-      cellContent = "◯";
-      cellClass += " text-white bg-purple-500 border-purple-600";
+      cellContent = "O";
+      cellClass += " text-white bg-purple-500 border-purple-600 font-mono";
     }
 
     // Apply animations
