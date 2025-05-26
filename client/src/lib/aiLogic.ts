@@ -120,20 +120,22 @@ export const getAIMove = (grid: GameGrid, difficulty: Difficulty = 'medium'): { 
       return getStrategicMove(grid) || emptyCells[Math.floor(Math.random() * emptyCells.length)];
 
     case 'medium':
-      // Always block winning moves, sometimes make winning moves
+      // Always prioritize winning moves first
+      const winMove = findWinningMove(grid, aiPlayer);
+      if (winMove) return winMove;
+
+      // Then block winning moves
       const blockMove = findWinningMove(grid, humanPlayer);
       if (blockMove) return blockMove;
-
-      const winMove = findWinningMove(grid, aiPlayer);
-      if (winMove && Math.random() < 0.8) return winMove;
 
       return getStrategicMove(grid) || emptyCells[Math.floor(Math.random() * emptyCells.length)];
 
     case 'hard':
-      // Always make winning moves, always block winning moves
+      // Always prioritize winning moves first
       const winMoveHard = findWinningMove(grid, aiPlayer);
       if (winMoveHard) return winMoveHard;
 
+      // Then always block winning moves
       const blockMoveHard = findWinningMove(grid, humanPlayer);
       if (blockMoveHard) return blockMoveHard;
 
