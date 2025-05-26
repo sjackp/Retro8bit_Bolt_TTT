@@ -193,10 +193,19 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
           );
           
           if (oldestPieceIndex !== -1) {
-            newPieceQueue.splice(oldestPieceIndex, 1); // Remove from queue
-            console.log(`✅ Removed piece from queue. New queue length: ${newPieceQueue.length}`);
+            // Remove from grid IMMEDIATELY before win detection
+            newGrid[oldestPiece.row][oldestPiece.col] = {
+              piece: null,
+              placementOrder: 0,
+              isBlinking: false,
+              fadeProgress: 0
+            };
+            newTotalPieces--; // Decrease count immediately
             
-            // Start fade animation immediately (piece was already blinking)
+            newPieceQueue.splice(oldestPieceIndex, 1); // Remove from queue
+            console.log(`✅ Removed piece IMMEDIATELY from grid and queue. New queue length: ${newPieceQueue.length}, Total pieces: ${newTotalPieces}`);
+            
+            // Start fade animation for visual effect only (doesn't affect game logic)
             setTimeout(() => {
               set((currentState) => {
                 const fadeGrid = [...currentState.grid.map(row => [...row])];
