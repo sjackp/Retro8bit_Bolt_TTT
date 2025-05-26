@@ -123,6 +123,17 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
         return;
       }
       
+      // Check if current player already has 3 pieces - if so, start blinking the oldest
+      const currentPlayerPieces = state.pieceQueue.filter(p => p.player === state.currentPlayer);
+      if (currentPlayerPieces.length >= 3) {
+        const oldestPlayerPiece = currentPlayerPieces[0];
+        set((prevState) => {
+          const blinkGrid = [...prevState.grid.map(row => [...row])];
+          blinkGrid[oldestPlayerPiece.row][oldestPlayerPiece.col].isBlinking = true;
+          return { grid: blinkGrid };
+        });
+      }
+      
       const { playHit, playSuccess } = useAudio.getState();
       
       set((state) => {
@@ -158,9 +169,8 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
           
           if (oldestPieceIndex !== -1) {
             newPieceQueue.splice(oldestPieceIndex, 1); // Remove from queue
-            newGrid[oldestPlayerPiece.row][oldestPlayerPiece.col].isBlinking = true;
             
-            // Remove the piece after blinking animation
+            // Start fade animation immediately (piece was already blinking)
             setTimeout(() => {
               set((currentState) => {
                 const fadeGrid = [...currentState.grid.map(row => [...row])];
@@ -199,7 +209,7 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
                 
                 return { grid: fadeGrid };
               });
-            }, 1500); // Wait 1.5 seconds before starting fade
+            }, 500); // Shorter delay since piece was already blinking
           }
         }
         
