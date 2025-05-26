@@ -51,20 +51,20 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
     const isEmpty = !cellData.piece;
     
     let cellContent = "";
-    let cellClass = "w-24 h-24 border-2 border-gray-600 flex items-center justify-center text-4xl font-bold cursor-pointer transition-all duration-200 relative overflow-hidden";
+    let cellClass = "w-24 h-24 border-2 flex items-center justify-center text-4xl font-bold font-mono cursor-pointer transition-all duration-200 relative overflow-hidden rounded-lg";
     
     if (isEmpty) {
-      cellClass += " hover:bg-gray-700 hover:border-gray-500";
+      cellClass += " border-purple-400/50 hover:border-purple-400 hover:bg-purple-400/10 hover:shadow-lg hover:shadow-purple-400/30 hover:scale-105";
     } else {
       cellClass += " cursor-default";
     }
 
     if (cellData.piece === 'X') {
       cellContent = "X";
-      cellClass += " text-red-400";
+      cellClass += " text-pink-400 border-pink-400 bg-pink-400/20 shadow-lg shadow-pink-400/50";
     } else if (cellData.piece === 'O') {
       cellContent = "O";
-      cellClass += " text-blue-400";
+      cellClass += " text-cyan-400 border-cyan-400 bg-cyan-400/20 shadow-lg shadow-cyan-400/50";
     }
 
     // Apply animations
@@ -169,12 +169,12 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
           </CardContent>
         </Card>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 relative z-10">
           <Button
             variant="outline"
             size="icon"
             onClick={onBackToMenu}
-            className="bg-black/80 backdrop-blur-sm border-gray-700 text-white hover:bg-gray-800"
+            className="bg-black/80 border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400/20 hover:text-yellow-300 shadow-lg shadow-yellow-400/50 transition-all duration-200"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -183,7 +183,7 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
             variant="outline"
             size="icon"
             onClick={toggleMute}
-            className="bg-black/80 backdrop-blur-sm border-gray-700 text-white hover:bg-gray-800"
+            className="bg-black/80 border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400/20 hover:text-cyan-300 shadow-lg shadow-cyan-400/50 transition-all duration-200"
           >
             {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </Button>
@@ -192,7 +192,7 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
             variant="outline"
             size="icon"
             onClick={resetGame}
-            className="bg-black/80 backdrop-blur-sm border-gray-700 text-white hover:bg-gray-800"
+            className="bg-black/80 border-2 border-pink-400 text-pink-400 hover:bg-pink-400/20 hover:text-pink-300 shadow-lg shadow-pink-400/50 transition-all duration-200"
           >
             <RotateCcw className="h-4 w-4" />
           </Button>
@@ -200,24 +200,24 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
       </div>
 
       {/* Score Display */}
-      <Card className="bg-black/80 backdrop-blur-sm border-gray-700 mb-8">
+      <Card className="bg-black/90 backdrop-blur-sm border-2 border-purple-500 shadow-lg shadow-purple-500/50 mb-8 relative z-10">
         <CardContent className="pt-4">
-          <div className="flex gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-red-400">{playerScores.X}</div>
-              <div className="text-sm text-gray-300">{isAIMode ? "You (X)" : "Player X"}</div>
+          <div className="flex gap-4 text-center justify-center">
+            <div className="p-4 rounded-lg bg-gradient-to-b from-pink-500/20 to-pink-600/20 border border-pink-400">
+              <div className="text-3xl font-bold text-pink-400 font-mono">{playerScores.X}</div>
+              <div className="text-sm text-pink-300 font-mono">{isAIMode ? "YOU (X)" : "PLAYER X"}</div>
             </div>
-            <div className="text-2xl text-gray-500">-</div>
-            <div>
-              <div className="text-2xl font-bold text-blue-400">{playerScores.O}</div>
-              <div className="text-sm text-gray-300">{isAIMode ? "AI (O)" : "Player O"}</div>
+            <div className="text-2xl text-purple-400 font-mono self-center">VS</div>
+            <div className="p-4 rounded-lg bg-gradient-to-b from-cyan-500/20 to-cyan-600/20 border border-cyan-400">
+              <div className="text-3xl font-bold text-cyan-400 font-mono">{playerScores.O}</div>
+              <div className="text-sm text-cyan-300 font-mono">{isAIMode ? "AI (O)" : "PLAYER O"}</div>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Game Board */}
-      <div className="grid grid-cols-3 gap-2 p-4 bg-black/50 backdrop-blur-sm rounded-lg border border-gray-700 mb-8">
+      <div className="grid grid-cols-3 gap-3 p-6 bg-black/90 backdrop-blur-sm rounded-lg border-2 border-purple-500 shadow-lg shadow-purple-500/50 mb-8 relative z-10">
         {[0, 1, 2].map(row => (
           [0, 1, 2].map(col => renderCell(row, col))
         ))}
