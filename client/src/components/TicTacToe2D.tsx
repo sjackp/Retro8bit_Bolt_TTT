@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { useTicTacToe2D } from "@/lib/stores/useTicTacToe2D";
 import { useAudio } from "@/lib/stores/useAudio";
 import { useGameMode } from "@/lib/stores/useGameMode";
+import { multiplayerManager } from "@/lib/multiplayer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Volume2, VolumeX, RotateCcw, ArrowLeft, Bot, Users, Trophy } from "lucide-react";
+import { Volume2, VolumeX, RotateCcw, ArrowLeft, Bot, Users, Trophy, Wifi, WifiOff } from "lucide-react";
 
 interface TicTacToe2DProps {
   onBackToMenu: () => void;

@@ -1,6 +1,7 @@
 import "@fontsource/inter";
 import TicTacToe2D from "./components/TicTacToe2D";
 import GameModeSelector from "./components/GameModeSelector";
+import DebugConsole from "./components/DebugConsole";
 import { useGameMode } from "./lib/stores/useGameMode";
 import { useTicTacToe2D } from "./lib/stores/useTicTacToe2D";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -42,6 +43,7 @@ function App() {
         ) : (
           <TicTacToe2D onBackToMenu={resetToMenu} />
         )}
+        <DebugConsole />
       </div>
     </QueryClientProvider>
   );

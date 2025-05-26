@@ -51,31 +51,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       room.guest = socket.id;
+      room.gameState = {
+        currentPlayer: 'X', // Host always starts
+        gameStarted: false
+      };
       socket.join(roomCode);
       callback({ success: true });
 
       // Notify host that opponent joined
       socket.to(room.host).emit('opponent-joined');
-      console.log(`${socket.id} joined room ${roomCode}`);
+      console.log(`${socket.id} joined room ${roomCode} - both players connected`);
     });
 
-    // Handle player moves
+    // Start game (host only)
+    socket.on('start-game', ({ roomCode }) => {
+      const room = gameRooms.get(roomCode);
+      if (!room || room.host !== socket.id) return;
+
+      room.gameState.gameStarted = true;
+      console.log(`Game started in room ${roomCode}`);
+      
+      // Notify both players
+      io.to(roomCode).emit('game-start');
+      io.to(roomCode).emit('turn-change', { currentPlayer: 'X' });
+    });
+
+    // Handle player moves with proper turn validation
     socket.on('player-move', ({ row, col, roomCode }) => {
       const room = gameRooms.get(roomCode);
-      if (!room) return;
+      if (!room || !room.gameState.gameStarted) {
+        console.log(`Move rejected - room not found or game not started in ${roomCode}`);
+        return;
+      }
 
+      // Determine if this player should be making this move
+      const isHost = socket.id === room.host;
+      const currentPlayer = room.gameState.currentPlayer;
+      const canMove = (currentPlayer === 'X' && isHost) || (currentPlayer === 'O' && !isHost);
+
+      if (!canMove) {
+        console.log(`Move rejected - not ${socket.id}'s turn in room ${roomCode} (current: ${currentPlayer})`);
+        socket.emit('move-rejected', { reason: 'Not your turn' });
+        return;
+      }
+
+      console.log(`Valid move from ${socket.id} in room ${roomCode}: (${row}, ${col})`);
+      
       // Send move to opponent
       socket.to(roomCode).emit('opponent-move', { row, col });
-      console.log(`Move sent in room ${roomCode}: ${row}, ${col}`);
-    });
-
-    // Sync game state
-    socket.on('sync-game', ({ gameState, roomCode }) => {
-      const room = gameRooms.get(roomCode);
-      if (!room) return;
-
-      room.gameState = gameState;
-      socket.to(roomCode).emit('game-sync', gameState);
+      
+      // Switch turns
+      room.gameState.currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      io.to(roomCode).emit('turn-change', { currentPlayer: room.gameState.currentPlayer });
+      
+      console.log(`Turn switched to ${room.gameState.currentPlayer} in room ${roomCode}`);
     });
 
     // Handle disconnect
