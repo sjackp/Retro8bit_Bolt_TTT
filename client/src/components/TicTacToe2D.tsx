@@ -54,7 +54,7 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
     let cellClass = "w-24 h-24 border-4 flex items-center justify-center text-4xl font-bold pixel-font cursor-pointer transition-all duration-200 relative overflow-hidden";
     
     if (isEmpty) {
-      cellClass += " border-green-400 hover:border-yellow-400 hover:bg-green-400/20 hover:animate-retro-glow";
+      cellClass += " border-orange-400 hover:border-yellow-400 hover:bg-orange-400/20 hover:animate-retro-glow";
     } else {
       cellClass += " cursor-default";
     }
@@ -86,14 +86,16 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
         onClick={() => handleCellClick(row, col)}
         style={cellStyle}
       >
-        {cellContent}
+        <span className="flex items-center justify-center w-full h-full">
+          {cellContent}
+        </span>
         {cellData.piece && (
-          <div className="absolute bottom-1 right-1 text-xs text-gray-500">
+          <div className="absolute bottom-1 right-1 text-xs text-gray-400 pixel-font">
             {cellData.placementOrder}
           </div>
         )}
         {isEmpty && gamePhase === 'playing' && (
-          <div className="absolute inset-0 flex items-center justify-center text-2xl opacity-20">
+          <div className="absolute inset-0 flex items-center justify-center text-2xl opacity-30 text-orange-300 pixel-font">
             {currentPlayer}
           </div>
         )}
@@ -102,34 +104,29 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-black relative overflow-hidden retro-scanlines">
-      {/* 8-bit style background pattern */}
-      <div className="absolute inset-0 opacity-30">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-purple-900 via-indigo-900 to-black relative overflow-hidden retro-scanlines">
+      {/* Subtle starfield background */}
+      <div className="absolute inset-0 opacity-20">
         <div className="h-full w-full" style={{
           backgroundImage: `
-            repeating-linear-gradient(
-              0deg,
-              #00ff00 0px, #00ff00 2px,
-              transparent 2px, transparent 8px
-            ),
-            repeating-linear-gradient(
-              90deg,
-              #00ff00 0px, #00ff00 2px,
-              transparent 2px, transparent 8px
-            )
+            radial-gradient(2px 2px at 20% 30%, #fff, transparent),
+            radial-gradient(2px 2px at 40% 70%, #fff, transparent),
+            radial-gradient(1px 1px at 90% 40%, #fff, transparent),
+            radial-gradient(1px 1px at 60% 10%, #fff, transparent),
+            radial-gradient(2px 2px at 80% 80%, #fff, transparent)
           `,
-          backgroundSize: '16px 16px'
+          backgroundSize: '200px 200px'
         }}></div>
       </div>
       
       {/* 8-bit style top and bottom borders */}
-      <div className="absolute top-0 left-0 w-full h-2 bg-green-500 animate-retro-glow"></div>
-      <div className="absolute bottom-0 left-0 w-full h-2 bg-green-500 animate-retro-glow"></div>
+      <div className="absolute top-0 left-0 w-full h-2 bg-orange-500 animate-retro-glow"></div>
+      <div className="absolute bottom-0 left-0 w-full h-2 bg-orange-500 animate-retro-glow"></div>
       {/* Header */}
       <div className="flex justify-between items-center w-full max-w-2xl mb-8 relative z-10">
-        <Card className="bg-black border-4 border-green-500 shadow-lg">
+        <Card className="bg-black border-4 border-orange-500 shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg text-green-400 flex items-center gap-2 pixel-font tracking-wider uppercase">
+            <CardTitle className="text-lg text-orange-400 flex items-center gap-2 pixel-font tracking-wider uppercase">
               {isAIMode ? <Bot className="h-5 w-5 text-yellow-400" /> : <Users className="h-5 w-5 text-yellow-400" />}
               <span className="animate-retro-glow">
                 {isAIMode ? "vs CPU" : gameMode === 'multiplayer' ? `ROOM ${roomCode}` : "TIC-TAC-TOE"}
@@ -140,7 +137,7 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
             <div className="space-y-2">
               {gamePhase === 'playing' && !winner && (
                 <div className="flex items-center gap-2">
-                  <span className="text-green-400 pixel-font text-sm">PLAYER:</span>
+                  <span className="text-orange-400 pixel-font text-sm">PLAYER:</span>
                   <Badge className={`pixel-font font-bold border-2 ${currentPlayer === 'X' ? 
                     'bg-red-500 border-red-600 text-white animate-retro-glow' : 
                     'bg-blue-500 border-blue-600 text-white animate-retro-glow'}`}>
@@ -164,7 +161,7 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
                 </div>
               )}
               
-              <div className="text-sm text-green-400 pixel-font">
+              <div className="text-sm text-orange-400 pixel-font">
                 PIECES: {totalPieces}/6
               </div>
               
@@ -191,7 +188,7 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
             variant="outline"
             size="icon"
             onClick={toggleMute}
-            className="bg-black border-4 border-green-400 text-green-400 hover:bg-green-400 hover:text-black pixel-font animate-retro-glow"
+            className="bg-black border-4 border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-black pixel-font animate-retro-glow"
           >
             {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </Button>
@@ -208,14 +205,14 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
       </div>
 
       {/* Score Display */}
-      <Card className="bg-black border-4 border-green-500 shadow-lg mb-8 relative z-10">
+      <Card className="bg-black border-4 border-orange-500 shadow-lg mb-8 relative z-10">
         <CardContent className="pt-4">
           <div className="flex gap-4 text-center justify-center">
             <div className="p-4 bg-red-600 border-4 border-red-700">
               <div className="text-3xl font-bold text-white pixel-font">{playerScores.X}</div>
               <div className="text-sm text-white pixel-font">{isAIMode ? "YOU" : "P1"}</div>
             </div>
-            <div className="text-2xl text-green-400 pixel-font self-center animate-retro-glow">VS</div>
+            <div className="text-2xl text-orange-400 pixel-font self-center animate-retro-glow">VS</div>
             <div className="p-4 bg-blue-600 border-4 border-blue-700">
               <div className="text-3xl font-bold text-white pixel-font">{playerScores.O}</div>
               <div className="text-sm text-white pixel-font">{isAIMode ? "CPU" : "P2"}</div>
@@ -225,7 +222,7 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
       </Card>
 
       {/* Game Board */}
-      <div className="grid grid-cols-3 gap-4 p-6 bg-black border-4 border-green-500 shadow-lg mb-8 relative z-10">
+      <div className="grid grid-cols-3 gap-4 p-6 bg-black border-4 border-orange-500 shadow-lg mb-8 relative z-10">
         {[0, 1, 2].map(row => (
           [0, 1, 2].map(col => renderCell(row, col))
         ))}
