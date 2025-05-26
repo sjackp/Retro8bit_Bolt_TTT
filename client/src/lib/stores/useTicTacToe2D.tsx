@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { useAudio } from "./useAudio";
+import { getAIMove } from "../aiLogic";
 
 export type Player = 'X' | 'O';
 export type GamePhase = 'playing' | 'ended' | 'draw';
@@ -23,11 +24,14 @@ interface TicTacToe2DState {
   totalPieces: number;
   pieceQueue: Array<{ row: number; col: number; player: Player; order: number }>;
   placementOrder: number;
+  isAIMode: boolean;
+  isAIThinking: boolean;
   
   // Actions
   placePiece: (row: number, col: number) => void;
   resetGame: () => void;
   switchPlayer: () => void;
+  setAIMode: (enabled: boolean) => void;
 }
 
 // Initialize empty 3x3 grid
@@ -93,6 +97,8 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
     totalPieces: 0,
     pieceQueue: [],
     placementOrder: 1,
+    isAIMode: false,
+    isAIThinking: false,
     
     placePiece: (row: number, col: number) => {
       const state = get();
@@ -187,9 +193,11 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
           playHit();
         }
         
-        return {
+        const newCurrentPlayer = winner ? state.currentPlayer : (state.currentPlayer === 'X' ? 'O' : 'X');
+        
+        const newState = {
           grid: newGrid,
-          currentPlayer: winner ? state.currentPlayer : (state.currentPlayer === 'X' ? 'O' : 'X'),
+          currentPlayer: newCurrentPlayer,
           winner,
           gamePhase: newGamePhase,
           playerScores: newPlayerScores,
@@ -197,6 +205,28 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
           pieceQueue: newPieceQueue,
           placementOrder: currentOrder + 1
         };
+        
+        // Trigger AI move if it's AI mode and AI's turn
+        if (state.isAIMode && !winner && newCurrentPlayer === 'O' && newGamePhase === 'playing') {
+          setTimeout(() => {
+            set({ isAIThinking: true });
+            
+            // AI thinking delay for better UX
+            setTimeout(() => {
+              const currentState = get();
+              const aiMove = getAIMove(currentState.grid);
+              
+              if (aiMove && currentState.currentPlayer === 'O' && currentState.gamePhase === 'playing') {
+                set({ isAIThinking: false });
+                currentState.placePiece(aiMove.row, aiMove.col);
+              } else {
+                set({ isAIThinking: false });
+              }
+            }, 800); // AI thinking time
+          }, 100);
+        }
+        
+        return newState;
       });
     },
     
@@ -208,7 +238,8 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
         gamePhase: 'playing',
         totalPieces: 0,
         pieceQueue: [],
-        placementOrder: 1
+        placementOrder: 1,
+        isAIThinking: false
       });
     },
     
@@ -216,6 +247,13 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
       set((state) => ({
         currentPlayer: state.currentPlayer === 'X' ? 'O' : 'X'
       }));
+    },
+    
+    setAIMode: (enabled: boolean) => {
+      set({
+        isAIMode: enabled,
+        isAIThinking: false
+      });
     }
   }))
 );
