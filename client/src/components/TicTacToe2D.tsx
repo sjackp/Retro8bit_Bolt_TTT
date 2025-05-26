@@ -5,7 +5,7 @@ import { useGameMode } from "@/lib/stores/useGameMode";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Volume2, VolumeX, RotateCcw, ArrowLeft, Bot, Users } from "lucide-react";
+import { Volume2, VolumeX, RotateCcw, ArrowLeft, Bot, Users, Trophy } from "lucide-react";
 
 interface TicTacToe2DProps {
   onBackToMenu: () => void;
@@ -102,46 +102,67 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-purple-900 via-pink-900 to-black relative overflow-hidden">
+      {/* Retro grid background */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="h-full w-full" style={{
+          backgroundImage: `
+            linear-gradient(rgba(255, 0, 255, 0.3) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 0, 255, 0.3) 1px, transparent 1px)
+          `,
+          backgroundSize: '30px 30px'
+        }}></div>
+      </div>
+      
+      {/* Animated neon lines */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-pink-400 to-transparent animate-pulse"></div>
       {/* Header */}
-      <div className="flex justify-between items-center w-full max-w-2xl mb-8">
-        <Card className="bg-black/80 backdrop-blur-sm border-gray-700">
+      <div className="flex justify-between items-center w-full max-w-2xl mb-8 relative z-10">
+        <Card className="bg-black/90 backdrop-blur-sm border-2 border-cyan-400 shadow-lg shadow-cyan-400/50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg text-white flex items-center gap-2">
-              {isAIMode ? <Bot className="h-5 w-5" /> : <Users className="h-5 w-5" />}
-              {isAIMode ? "vs AI" : gameMode === 'multiplayer' ? `Room: ${roomCode}` : "2D Tic-Tac-Toe"}
+            <CardTitle className="text-lg text-cyan-400 flex items-center gap-2 font-mono tracking-wider">
+              {isAIMode ? <Bot className="h-5 w-5 text-pink-400" /> : <Users className="h-5 w-5 text-pink-400" />}
+              <span className="text-shadow-neon">
+                {isAIMode ? "vs AI" : gameMode === 'multiplayer' ? `Room: ${roomCode}` : "TIC-TAC-TOE"}
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               {gamePhase === 'playing' && !winner && (
                 <div className="flex items-center gap-2">
-                  <span className="text-white">Current Player:</span>
-                  <Badge variant={currentPlayer === 'X' ? "destructive" : "default"}>
-                    {isAIMode ? (currentPlayer === 'X' ? 'You' : 'AI') : currentPlayer}
+                  <span className="text-cyan-300 font-mono">Current Player:</span>
+                  <Badge className={`font-mono font-bold border-2 ${currentPlayer === 'X' ? 
+                    'bg-pink-500/20 border-pink-400 text-pink-400 shadow-lg shadow-pink-400/50' : 
+                    'bg-cyan-500/20 border-cyan-400 text-cyan-400 shadow-lg shadow-cyan-400/50'}`}>
+                    {isAIMode ? (currentPlayer === 'X' ? 'YOU' : 'AI') : currentPlayer}
                   </Badge>
                   {isAIThinking && currentPlayer === 'O' && (
-                    <span className="text-yellow-400 text-sm animate-pulse">AI thinking...</span>
+                    <span className="text-yellow-400 text-sm animate-pulse font-mono">AI COMPUTING...</span>
                   )}
                 </div>
               )}
               
               {winner && (
                 <div className="flex items-center gap-2">
-                  <span className="text-white">Winner:</span>
-                  <Badge variant={winner === 'X' ? "destructive" : "default"}>
-                    {winner}
-                  </Badge>
+                  <Trophy className="h-4 w-4 text-yellow-400 animate-bounce" />
+                  <span className="text-yellow-400 font-mono font-bold text-lg animate-pulse">
+                    {isAIMode ? 
+                      (winner === 'X' ? 'VICTORY!' : 'GAME OVER!') :
+                      `PLAYER ${winner} WINS!`
+                    }
+                  </span>
                 </div>
               )}
               
-              <div className="text-sm text-gray-300">
-                Total pieces: {totalPieces}/6
+              <div className="text-sm text-cyan-300 font-mono">
+                PIECES: {totalPieces}/6
               </div>
               
               {totalPieces >= 3 && (
-                <div className="text-xs text-yellow-400">
-                  Each player has 3 pieces max!
+                <div className="text-xs text-yellow-400 font-mono animate-pulse">
+                  ⚠ OLDEST PIECES WILL FADE
                 </div>
               )}
             </div>
