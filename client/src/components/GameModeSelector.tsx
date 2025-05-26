@@ -120,19 +120,24 @@ export default function GameModeSelector({ onModeSelect }: GameModeSelectorProps
                         type="text"
                         placeholder="ENTER CODE"
                         value={roomCode}
-                        onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                        onChange={(e) => {
+                          setRoomCode(e.target.value.toUpperCase());
+                          setErrorMessage(""); // Clear error when user types
+                        }}
                         className="bg-black border-2 border-orange-500 text-orange-400 placeholder-orange-600 pixel-font"
                         maxLength={6}
                       />
                     </div>
                     <Button 
                       onClick={handleJoinRoom}
-                      disabled={!roomCode.trim()}
+                      disabled={!roomCode.trim() || isLoading}
                       className="w-full bg-orange-500 hover:bg-orange-600 text-black border-2 border-orange-600 pixel-font flex items-center justify-center disabled:bg-gray-600 disabled:border-gray-700 disabled:text-gray-400"
                       size="lg"
                     >
                       <LogIn className="mr-2 h-5 w-5 flex-shrink-0" />
-                      <span className="flex items-center">JOIN ROOM</span>
+                      <span className="flex items-center">
+                        {isLoading ? "JOINING..." : "JOIN ROOM"}
+                      </span>
                     </Button>
                   </div>
                 </div>
@@ -161,7 +166,14 @@ export default function GameModeSelector({ onModeSelect }: GameModeSelectorProps
             )}
 
             <Button 
-              onClick={() => setShowMultiplayerOptions(false)}
+              onClick={() => {
+                setShowMultiplayerOptions(false);
+                setIsCreatingRoom(false);
+                setRoomCode("");
+                setGeneratedRoomCode("");
+                setErrorMessage("");
+                setIsLoading(false);
+              }}
               variant="outline"
               className="w-full bg-black border-2 border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-black pixel-font"
             >

@@ -299,7 +299,17 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
         isMultiplayerMode: enabled,
         myPlayer: isHost ? 'X' : 'O',
         isMyTurn: isHost, // Host goes first
-        opponentConnected: false
+        opponentConnected: false,
+        // Reset scores when starting multiplayer
+        playerScores: { X: 0, O: 0 },
+        // Reset game state
+        grid: createEmptyGrid(),
+        currentPlayer: 'X',
+        winner: null,
+        gamePhase: 'playing',
+        totalPieces: 0,
+        pieceQueue: [],
+        placementOrder: 1
       });
     },
     
