@@ -149,7 +149,7 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
     const isEmpty = !cellData.piece;
     
     let cellContent = "";
-    let cellClass = "w-24 h-24 border-4 flex items-center justify-center text-4xl font-bold pixel-font cursor-pointer transition-all duration-200 relative overflow-hidden";
+    let cellClass = "w-24 h-24 border-4 flex items-center justify-center text-4xl font-bold pixel-font cursor-pointer transition-all duration-200 relative overflow-hidden text-center leading-none";
     
     if (isEmpty) {
       cellClass += " border-orange-400 hover:border-yellow-400 hover:bg-orange-400/20 hover:animate-retro-glow";
