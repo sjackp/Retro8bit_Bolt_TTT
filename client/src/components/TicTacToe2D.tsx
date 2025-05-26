@@ -50,9 +50,14 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
     setSuccessSound(successAudio);
   }, [setHitSound, setSuccessSound]);
 
-  // Initialize multiplayer mode when component mounts
+  // Initialize game mode when component mounts
   useEffect(() => {
-    if (gameMode === 'multiplayer' && roomCode) {
+    if (gameMode === 'ai') {
+      console.log('🤖 GAME: Initializing AI mode');
+      // Make sure multiplayer mode is disabled for AI
+      setMultiplayerMode(false, false);
+      setGameStarted(true); // AI games start immediately
+    } else if (gameMode === 'multiplayer' && roomCode) {
       console.log(`🎯 GAME: Initializing multiplayer mode - Room: ${roomCode}, Host: ${isHost}`);
       setMultiplayerMode(true, isHost || false);
       
