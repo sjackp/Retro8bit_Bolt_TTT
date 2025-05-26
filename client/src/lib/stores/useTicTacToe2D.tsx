@@ -146,7 +146,7 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
           order: currentOrder
         });
         
-        // Check if current player has more than 3 pieces - remove their oldest piece
+        // Check if current player now has more than 3 pieces - remove their oldest piece
         const currentPlayerPieces = newPieceQueue.filter(p => p.player === state.currentPlayer);
         if (currentPlayerPieces.length > 3) {
           const oldestPlayerPiece = currentPlayerPieces[0]; // Get the oldest piece of current player
