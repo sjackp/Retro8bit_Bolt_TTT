@@ -266,11 +266,11 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
             playSuccess();
           } else {
             console.log("🎯 No winner, continuing game");
-            playHit();
+            playPlace();
           }
         } else {
           console.log("⚠️ Skipping win check due to piece removal in progress");
-          playHit();
+          playPlace();
         }
         
         const newCurrentPlayer = winner ? state.currentPlayer : (state.currentPlayer === 'X' ? 'O' : 'X');
