@@ -146,18 +146,25 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
           order: currentOrder
         });
         
-        // Check if we need to remove old pieces (FIFO when grid gets full)
-        if (newTotalPieces > 5) { // Start removing when we have 6 pieces
-          const oldestPiece = newPieceQueue.shift();
-          if (oldestPiece) {
-            // Start blinking animation for the piece to be removed
-            newGrid[oldestPiece.row][oldestPiece.col].isBlinking = true;
+        // Check if current player has more than 3 pieces - remove their oldest piece
+        const currentPlayerPieces = newPieceQueue.filter(p => p.player === state.currentPlayer);
+        if (currentPlayerPieces.length > 3) {
+          const oldestPlayerPiece = currentPlayerPieces[0]; // Get the oldest piece of current player
+          const oldestPieceIndex = newPieceQueue.findIndex(p => 
+            p.row === oldestPlayerPiece.row && 
+            p.col === oldestPlayerPiece.col && 
+            p.order === oldestPlayerPiece.order
+          );
+          
+          if (oldestPieceIndex !== -1) {
+            newPieceQueue.splice(oldestPieceIndex, 1); // Remove from queue
+            newGrid[oldestPlayerPiece.row][oldestPlayerPiece.col].isBlinking = true;
             
             // Remove the piece after blinking animation
             setTimeout(() => {
               set((currentState) => {
                 const fadeGrid = [...currentState.grid.map(row => [...row])];
-                const cellToFade = fadeGrid[oldestPiece.row][oldestPiece.col];
+                const cellToFade = fadeGrid[oldestPlayerPiece.row][oldestPlayerPiece.col];
                 
                 // Start fade animation
                 const startTime = performance.now();
@@ -174,7 +181,7 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
                     // Remove the piece completely
                     set((finalState) => {
                       const finalGrid = [...finalState.grid.map(row => [...row])];
-                      finalGrid[oldestPiece.row][oldestPiece.col] = {
+                      finalGrid[oldestPlayerPiece.row][oldestPlayerPiece.col] = {
                         piece: null,
                         placementOrder: 0,
                         isBlinking: false,

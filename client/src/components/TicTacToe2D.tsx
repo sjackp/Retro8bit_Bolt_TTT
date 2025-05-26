@@ -136,12 +136,12 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
               )}
               
               <div className="text-sm text-gray-300">
-                Pieces: {totalPieces}/9
+                Total pieces: {totalPieces}/6
               </div>
               
-              {totalPieces >= 5 && (
+              {totalPieces >= 3 && (
                 <div className="text-xs text-yellow-400">
-                  Oldest pieces will start disappearing!
+                  Each player has 3 pieces max!
                 </div>
               )}
             </div>
@@ -206,10 +206,10 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
       <Card className="bg-black/80 backdrop-blur-sm border-gray-700 max-w-md">
         <CardContent className="pt-4">
           <div className="text-sm text-gray-300 space-y-1 text-center">
-            <div>• Click cells to place pieces</div>
+            <div>• Each player has exactly 3 pieces</div>
+            <div>• Click cells to place your pieces</div>
             <div>• Get 3 in a row to win</div>
-            <div>• Game continues forever - no draws!</div>
-            <div>• Oldest pieces disappear when grid fills</div>
+            <div>• When placing a 4th piece, your oldest disappears</div>
           </div>
         </CardContent>
       </Card>
