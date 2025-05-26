@@ -119,17 +119,13 @@ export default function TicTacToe2D() {
                 </div>
               )}
               
-              {gamePhase === 'draw' && (
-                <Badge variant="secondary">Draw!</Badge>
-              )}
-              
               <div className="text-sm text-gray-300">
                 Pieces: {totalPieces}/9
               </div>
               
-              {totalPieces >= 6 && (
+              {totalPieces >= 8 && (
                 <div className="text-xs text-yellow-400">
-                  Grid filling up! Oldest pieces will disappear.
+                  Grid full! Oldest pieces will disappear.
                 </div>
               )}
             </div>
@@ -187,19 +183,20 @@ export default function TicTacToe2D() {
           <div className="text-sm text-gray-300 space-y-1 text-center">
             <div>• Click cells to place pieces</div>
             <div>• Get 3 in a row to win</div>
+            <div>• Game continues forever - no draws!</div>
             <div>• Oldest pieces disappear when grid fills</div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Game Over Overlay */}
-      {(winner || gamePhase === 'draw') && (
+      {/* Game Over Overlay - Only for winners, no draws */}
+      {winner && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <Card className="bg-black/90 backdrop-blur-sm border-gray-700">
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
                 <div className="text-3xl font-bold text-white">
-                  {winner ? `Player ${winner} Wins!` : "It's a Draw!"}
+                  Player {winner} Wins!
                 </div>
                 
                 <div className="flex gap-2 justify-center">

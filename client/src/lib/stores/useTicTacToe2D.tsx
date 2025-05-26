@@ -124,7 +124,7 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
         });
         
         // Check if we need to remove old pieces (FIFO when grid gets full)
-        if (newTotalPieces > 6) { // Start removing when more than 6 pieces
+        if (newTotalPieces > 8) { // Start removing when we have 9 pieces (grid is full)
           const oldestPiece = newPieceQueue.shift();
           if (oldestPiece) {
             // Start blinking animation for the piece to be removed
@@ -170,8 +170,6 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
                 return { grid: fadeGrid };
               });
             }, 1500); // Wait 1.5 seconds before starting fade
-            
-            newTotalPieces--; // We're removing one, so adjust count
           }
         }
         
@@ -185,18 +183,13 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
           newPlayerScores[winner]++;
           playSuccess();
         } else {
-          // Check for draw (grid full with no winner)
-          const isFull = newPieceQueue.length >= 9;
-          if (isFull) {
-            newGamePhase = 'draw';
-          } else {
-            playHit();
-          }
+          // No draw condition - game continues forever with piece removal
+          playHit();
         }
         
         return {
           grid: newGrid,
-          currentPlayer: winner || newGamePhase === 'draw' ? state.currentPlayer : (state.currentPlayer === 'X' ? 'O' : 'X'),
+          currentPlayer: winner ? state.currentPlayer : (state.currentPlayer === 'X' ? 'O' : 'X'),
           winner,
           gamePhase: newGamePhase,
           playerScores: newPlayerScores,
