@@ -137,6 +137,13 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
         return;
       }
       
+      // Prevent race conditions - ensure piece count is synced
+      if (state.totalPieces < 0 || state.totalPieces !== state.pieceQueue.length) {
+        console.warn("⚠️ Syncing piece count", state.totalPieces, "->", state.pieceQueue.length);
+        set({ totalPieces: state.pieceQueue.length });
+        return;
+      }
+      
       // In multiplayer mode, check if it's the player's turn and they're playing as the current player
       if (state.isMultiplayerMode && (!state.isMyTurn || state.currentPlayer !== state.myPlayer)) {
         return;
@@ -200,9 +207,9 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
               isBlinking: false,
               fadeProgress: 0
             };
-            newTotalPieces--; // Decrease count immediately
             
             newPieceQueue.splice(oldestPieceIndex, 1); // Remove from queue
+            newTotalPieces = newPieceQueue.length; // Set total to actual queue length
             console.log(`✅ Removed piece IMMEDIATELY from grid and queue. New queue length: ${newPieceQueue.length}, Total pieces: ${newTotalPieces}`);
             
             // Start fade animation for visual effect only (doesn't affect game logic)
@@ -281,7 +288,7 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
           winner,
           gamePhase: newGamePhase,
           playerScores: newPlayerScores,
-          totalPieces: newTotalPieces,
+          totalPieces: newPieceQueue.length, // Always sync with queue length
           pieceQueue: newPieceQueue,
           placementOrder: currentOrder + 1
         };
