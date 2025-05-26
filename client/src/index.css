@@ -86,8 +86,36 @@ canvas {
   bottom: 0;
   background: linear-gradient(
     transparent 50%,
-    rgba(0, 255, 0, 0.03) 50%
+    rgba(255, 133, 0, 0.03) 50%
   );
   background-size: 100% 4px;
   pointer-events: none;
+}
+
+/* 8-bit Circuit Board Background */
+@keyframes retro-scroll {
+  0% { background-position: 0 0; }
+  100% { background-position: 64px 64px; }
+}
+
+.retro-circuit-bg {
+  background-color: #0a0a2e;
+  background-image: 
+    /* Grid pattern */
+    linear-gradient(rgba(255, 133, 0, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 133, 0, 0.1) 1px, transparent 1px),
+    /* Circuit traces */
+    linear-gradient(45deg, transparent 30px, rgba(255, 133, 0, 0.05) 30px, rgba(255, 133, 0, 0.05) 32px, transparent 32px),
+    linear-gradient(-45deg, transparent 30px, rgba(255, 133, 0, 0.05) 30px, rgba(255, 133, 0, 0.05) 32px, transparent 32px),
+    /* Circuit nodes */
+    radial-gradient(circle at 25% 25%, rgba(255, 133, 0, 0.2) 1px, transparent 2px),
+    radial-gradient(circle at 75% 75%, rgba(255, 133, 0, 0.2) 1px, transparent 2px);
+  background-size: 
+    32px 32px,
+    32px 32px,
+    64px 64px,
+    64px 64px,
+    32px 32px,
+    32px 32px;
+  animation: retro-scroll 30s linear infinite;
 }

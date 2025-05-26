@@ -37,7 +37,10 @@ export default function GameModeSelector({ onModeSelect }: GameModeSelectorProps
 
   if (showMultiplayerOptions) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-purple-900 via-indigo-900 to-black relative overflow-hidden retro-scanlines">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden retro-scanlines">
+        {/* 8-bit Circuit Board Background */}
+        <div className="absolute inset-0 retro-circuit-bg"></div>
+        
         {/* 8-bit style top and bottom borders */}
         <div className="absolute top-0 left-0 w-full h-2 bg-orange-500 animate-retro-glow"></div>
         <div className="absolute bottom-0 left-0 w-full h-2 bg-orange-500 animate-retro-glow"></div>
@@ -127,20 +130,9 @@ export default function GameModeSelector({ onModeSelect }: GameModeSelectorProps
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-purple-900 via-indigo-900 to-black relative overflow-hidden retro-scanlines">
-      {/* Subtle starfield background */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="h-full w-full" style={{
-          backgroundImage: `
-            radial-gradient(2px 2px at 20% 30%, #fff, transparent),
-            radial-gradient(2px 2px at 40% 70%, #fff, transparent),
-            radial-gradient(1px 1px at 90% 40%, #fff, transparent),
-            radial-gradient(1px 1px at 60% 10%, #fff, transparent),
-            radial-gradient(2px 2px at 80% 80%, #fff, transparent)
-          `,
-          backgroundSize: '200px 200px'
-        }}></div>
-      </div>
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden retro-scanlines">
+      {/* 8-bit Circuit Board Background */}
+      <div className="absolute inset-0 retro-circuit-bg"></div>
       
       {/* 8-bit style top and bottom borders */}
       <div className="absolute top-0 left-0 w-full h-2 bg-orange-500 animate-retro-glow"></div>
