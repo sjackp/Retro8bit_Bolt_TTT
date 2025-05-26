@@ -28,6 +28,7 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
   
   const { gameMode, roomCode } = useGameMode();
   const { isMuted, toggleMute, setHitSound, setSuccessSound } = useAudio();
+  const [showBoard, setShowBoard] = useState(false);
 
   // Initialize audio
   useEffect(() => {
@@ -236,20 +237,99 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
       </Card>
 
       {/* Game Over Overlay - Only for winners, no draws */}
-      {winner && (
+      {winner && !showBoard && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <Card className="bg-black/90 backdrop-blur-sm border-gray-700">
+          <Card className="bg-black/90 backdrop-blur-sm border-orange-500 border-4">
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
-                <div className="text-3xl font-bold text-white">
-                  Player {winner} Wins!
+                <div className="text-3xl font-bold text-white pixel-font animate-retro-glow">
+                  {isAIMode && winner === 'O' ? 'CPU WINS!' : 
+                   isAIMode && winner === 'X' ? 'YOU WIN!' : 
+                   `PLAYER ${winner} WINS!`}
                 </div>
                 
                 <div className="flex gap-2 justify-center">
-                  <Button onClick={resetGame} variant="default">
+                  <Button 
+                    onClick={() => setShowBoard(true)} 
+                    variant="outline"
+                    className="bg-black border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-black pixel-font"
+                  >
+                    View Board
+                  </Button>
+                  <Button 
+                    onClick={resetGame} 
+                    variant="default"
+                    className="bg-orange-500 hover:bg-orange-600 text-black pixel-font"
+                  >
                     Play Again
                   </Button>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Board View Overlay */}
+      {winner && showBoard && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <Card className="bg-black/90 backdrop-blur-sm border-orange-500 border-4 max-w-lg">
+            <CardHeader>
+              <CardTitle className="text-center text-orange-400 pixel-font">
+                Final Board - {isAIMode && winner === 'O' ? 'CPU Won' : 
+                             isAIMode && winner === 'X' ? 'You Won' : 
+                             `Player ${winner} Won`}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-2 p-4 mb-4">
+                {[0, 1, 2].map(row => (
+                  [0, 1, 2].map(col => {
+                    const cellData = grid[row][col];
+                    const isEmpty = !cellData.piece;
+                    
+                    let cellClass = "w-16 h-16 bg-gray-800 border-2 border-gray-600 flex items-center justify-center text-3xl font-bold pixel-font relative cursor-default";
+                    let cellContent = null;
+
+                    if (!isEmpty) {
+                      if (cellData.piece === 'X') {
+                        cellClass += " text-red-400 border-red-500";
+                        cellContent = "✕";
+                      } else {
+                        cellClass += " text-blue-400 border-blue-500";
+                        cellContent = "◯";
+                      }
+                    }
+
+                    return (
+                      <div key={`view-${row}-${col}`} className={cellClass}>
+                        <span className="flex items-center justify-center w-full h-full">
+                          {cellContent}
+                        </span>
+                      </div>
+                    );
+                  })
+                ))}
+              </div>
+              
+              <div className="flex gap-2 justify-center">
+                <Button 
+                  onClick={() => setShowBoard(false)} 
+                  variant="outline"
+                  className="bg-black border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-black pixel-font"
+                >
+                  Back
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setShowBoard(false);
+                    resetGame();
+                  }} 
+                  variant="default"
+                  className="bg-orange-500 hover:bg-orange-600 text-black pixel-font"
+                >
+                  Play Again
+                </Button>
               </div>
             </CardContent>
           </Card>
