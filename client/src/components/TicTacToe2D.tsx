@@ -89,11 +89,6 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
         <span className="flex items-center justify-center w-full h-full">
           {cellContent}
         </span>
-        {cellData.piece && (
-          <div className="absolute bottom-1 right-1 text-xs text-gray-400 pixel-font">
-            {cellData.placementOrder}
-          </div>
-        )}
         {isEmpty && gamePhase === 'playing' && (
           <div className="absolute inset-0 flex items-center justify-center text-2xl opacity-30 text-orange-300 pixel-font">
             {currentPlayer}
