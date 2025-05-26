@@ -123,13 +123,12 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
         return;
       }
       
-      // Check if current player already has 3 pieces - if so, start blinking the oldest
-      const currentPlayerPieces = state.pieceQueue.filter(p => p.player === state.currentPlayer);
-      if (currentPlayerPieces.length >= 3) {
-        const oldestPlayerPiece = currentPlayerPieces[0];
+      // Check if total pieces are at maximum (5) - if so, start blinking the oldest piece
+      if (state.pieceQueue.length >= 5) {
+        const oldestPiece = state.pieceQueue[0];
         set((prevState) => {
           const blinkGrid = [...prevState.grid.map(row => [...row])];
-          blinkGrid[oldestPlayerPiece.row][oldestPlayerPiece.col].isBlinking = true;
+          blinkGrid[oldestPiece.row][oldestPiece.col].isBlinking = true;
           return { grid: blinkGrid };
         });
       }
@@ -157,14 +156,13 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
           order: currentOrder
         });
         
-        // Check if current player now has more than 3 pieces - remove their oldest piece
-        const currentPlayerPieces = newPieceQueue.filter(p => p.player === state.currentPlayer);
-        if (currentPlayerPieces.length > 3) {
-          const oldestPlayerPiece = currentPlayerPieces[0]; // Get the oldest piece of current player
+        // Check if total pieces exceed 5 - remove the oldest piece on the board
+        if (newPieceQueue.length > 5) {
+          const oldestPiece = newPieceQueue[0]; // Get the oldest piece on the board
           const oldestPieceIndex = newPieceQueue.findIndex(p => 
-            p.row === oldestPlayerPiece.row && 
-            p.col === oldestPlayerPiece.col && 
-            p.order === oldestPlayerPiece.order
+            p.row === oldestPiece.row && 
+            p.col === oldestPiece.col && 
+            p.order === oldestPiece.order
           );
           
           if (oldestPieceIndex !== -1) {
@@ -174,7 +172,7 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
             setTimeout(() => {
               set((currentState) => {
                 const fadeGrid = [...currentState.grid.map(row => [...row])];
-                const cellToFade = fadeGrid[oldestPlayerPiece.row][oldestPlayerPiece.col];
+                const cellToFade = fadeGrid[oldestPiece.row][oldestPiece.col];
                 
                 // Start fade animation
                 const startTime = performance.now();
@@ -191,7 +189,7 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
                     // Remove the piece completely
                     set((finalState) => {
                       const finalGrid = [...finalState.grid.map(row => [...row])];
-                      finalGrid[oldestPlayerPiece.row][oldestPlayerPiece.col] = {
+                      finalGrid[oldestPiece.row][oldestPiece.col] = {
                         piece: null,
                         placementOrder: 0,
                         isBlinking: false,

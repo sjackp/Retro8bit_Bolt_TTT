@@ -160,7 +160,7 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
                 PIECES: {totalPieces}/5
               </div>
               
-              {totalPieces >= 3 && (
+              {totalPieces >= 5 && (
                 <div className="text-xs text-yellow-400 pixel-font animate-pixel-blink">
                   ⚠ OLDEST FADE
                 </div>
