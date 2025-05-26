@@ -188,19 +188,13 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
           order: currentOrder
         });
         
-        // Check if total pieces exceed 5 - remove the oldest piece on the board
+        // Check if total pieces exceed 5 - remove ONLY the oldest piece
         if (newPieceQueue.length > 5) {
-          const oldestPiece = newPieceQueue[0]; // Get the oldest piece on the board
-          console.log(`🗑️ REMOVING OLDEST PIECE: ${oldestPiece.player} at (${oldestPiece.row}, ${oldestPiece.col}) with order ${oldestPiece.order}`);
-          
-          const oldestPieceIndex = newPieceQueue.findIndex(p => 
-            p.row === oldestPiece.row && 
-            p.col === oldestPiece.col && 
-            p.order === oldestPiece.order
-          );
-          
-          if (oldestPieceIndex !== -1) {
-            // Remove from grid IMMEDIATELY before win detection
+          const oldestPiece = newPieceQueue.shift(); // Remove first item from queue
+          if (oldestPiece) {
+            console.log(`🗑️ REMOVING OLDEST PIECE: ${oldestPiece.player} at (${oldestPiece.row}, ${oldestPiece.col}) with order ${oldestPiece.order}`);
+            
+            // Remove from grid immediately
             newGrid[oldestPiece.row][oldestPiece.col] = {
               piece: null,
               placementOrder: 0,
@@ -208,50 +202,7 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
               fadeProgress: 0
             };
             
-            newPieceQueue.splice(oldestPieceIndex, 1); // Remove from queue
-            newTotalPieces = newPieceQueue.length; // Set total to actual queue length
-            console.log(`✅ Removed piece IMMEDIATELY from grid and queue. New queue length: ${newPieceQueue.length}, Total pieces: ${newTotalPieces}`);
-            
-            // Start fade animation for visual effect only (doesn't affect game logic)
-            setTimeout(() => {
-              set((currentState) => {
-                const fadeGrid = [...currentState.grid.map(row => [...row])];
-                const cellToFade = fadeGrid[oldestPiece.row][oldestPiece.col];
-                
-                // Start fade animation
-                const startTime = performance.now();
-                const fadeAnimation = () => {
-                  const elapsed = performance.now() - startTime;
-                  const progress = Math.min(elapsed / 1000, 1); // 1 second fade
-                  
-                  cellToFade.fadeProgress = progress;
-                  cellToFade.isBlinking = false;
-                  
-                  if (progress < 1) {
-                    requestAnimationFrame(fadeAnimation);
-                  } else {
-                    // Remove the piece completely
-                    set((finalState) => {
-                      const finalGrid = [...finalState.grid.map(row => [...row])];
-                      finalGrid[oldestPiece.row][oldestPiece.col] = {
-                        piece: null,
-                        placementOrder: 0,
-                        isBlinking: false,
-                        fadeProgress: 0
-                      };
-                      
-                      return {
-                        grid: finalGrid,
-                        totalPieces: finalState.totalPieces - 1
-                      };
-                    });
-                  }
-                };
-                fadeAnimation();
-                
-                return { grid: fadeGrid };
-              });
-            }, 500); // Shorter delay since piece was already blinking
+            console.log(`✅ Removed piece IMMEDIATELY. Queue length: ${newPieceQueue.length}`);
           }
         }
         
