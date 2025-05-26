@@ -211,17 +211,23 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
           }
         }
         
-        // Check for winner
-        const winner = checkWinner(newGrid);
+        // Check for winner - but only count wins achieved by placement, not piece removal
+        let winner = null;
         let newGamePhase = state.gamePhase;
         let newPlayerScores = { ...state.playerScores };
         
-        if (winner) {
-          newGamePhase = 'ended';
-          newPlayerScores[winner]++;
-          playSuccess();
+        // Only check for winner if no pieces are being removed (legitimate win)
+        if (newPieceQueue.length <= 5) {
+          winner = checkWinner(newGrid);
+          if (winner) {
+            newGamePhase = 'ended';
+            newPlayerScores[winner]++;
+            playSuccess();
+          } else {
+            playHit();
+          }
         } else {
-          // No draw condition - game continues forever with piece removal
+          // If pieces are being removed, don't check for winner to prevent false wins
           playHit();
         }
         
