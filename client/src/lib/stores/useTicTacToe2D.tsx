@@ -141,7 +141,7 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
       if (state.totalPieces < 0 || state.totalPieces !== state.pieceQueue.length) {
         console.warn("⚠️ Syncing piece count", state.totalPieces, "->", state.pieceQueue.length);
         set({ totalPieces: state.pieceQueue.length });
-        return;
+        // Don't return here - continue with the move after sync
       }
       
       // In multiplayer mode, check if it's the player's turn and they're playing as the current player
