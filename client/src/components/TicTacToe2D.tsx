@@ -157,7 +157,7 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
               )}
               
               <div className="text-sm text-orange-400 pixel-font">
-                PIECES: {totalPieces}/6
+                PIECES: {totalPieces}/5
               </div>
               
               {totalPieces >= 3 && (
