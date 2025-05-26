@@ -24,12 +24,22 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
     totalPieces,
     pieceQueue,
     isAIMode,
-    isAIThinking
+    isAIThinking,
+    isMultiplayerMode,
+    opponentConnected,
+    isMyTurn,
+    myPlayer,
+    setMultiplayerMode,
+    setOpponentConnected,
+    setMyTurn,
+    handleOpponentMove
   } = useTicTacToe2D();
   
-  const { gameMode, roomCode } = useGameMode();
+  const { gameMode, roomCode, isHost } = useGameMode();
   const { isMuted, toggleMute, setHitSound, setSuccessSound } = useAudio();
   const [showBoard, setShowBoard] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [multiplayerState, setMultiplayerState] = useState(multiplayerManager.getState());
 
   // Initialize audio
   useEffect(() => {
@@ -40,12 +50,93 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
     setSuccessSound(successAudio);
   }, [setHitSound, setSuccessSound]);
 
-  const handleCellClick = (row: number, col: number) => {
-    if (gamePhase === 'playing' && !grid[row][col].piece && !isAIThinking) {
-      // In AI mode, only allow human player (X) to move
-      if (isAIMode && currentPlayer === 'O') return;
-      placePiece(row, col);
+  // Initialize multiplayer mode when component mounts
+  useEffect(() => {
+    if (gameMode === 'multiplayer' && roomCode) {
+      console.log(`🎯 GAME: Initializing multiplayer mode - Room: ${roomCode}, Host: ${isHost}`);
+      setMultiplayerMode(true, isHost || false);
+      
+      // Set up Socket.io callbacks
+      multiplayerManager.setCallbacks({
+        onOpponentJoined: () => {
+          console.log('🎯 GAME: Opponent joined callback triggered');
+          setOpponentConnected(true);
+          setMultiplayerState(multiplayerManager.getState());
+        },
+        onOpponentLeft: () => {
+          console.log('👋 GAME: Opponent left callback triggered');
+          setOpponentConnected(false);
+          setMultiplayerState(multiplayerManager.getState());
+        },
+        onOpponentMove: (row: number, col: number) => {
+          console.log(`🎲 GAME: Processing opponent move at (${row}, ${col})`);
+          handleOpponentMove(row, col);
+        },
+        onGameStart: () => {
+          console.log('🚀 GAME: Game start callback triggered');
+          setGameStarted(true);
+        },
+        onTurnChange: (isMyTurn: boolean) => {
+          console.log(`🔄 GAME: Turn change callback - My turn: ${isMyTurn}`);
+          setMyTurn(isMyTurn);
+          setMultiplayerState(multiplayerManager.getState());
+        }
+      });
     }
+    
+    return () => {
+      if (gameMode === 'multiplayer') {
+        multiplayerManager.leaveRoom();
+      }
+    };
+  }, [gameMode, roomCode, isHost, setMultiplayerMode, setOpponentConnected, setMyTurn, handleOpponentMove]);
+
+  const handleCellClick = (row: number, col: number) => {
+    // Basic validation
+    if (gamePhase !== 'playing' || grid[row][col].piece || isAIThinking) {
+      console.log('🚫 GAME: Move blocked - game not playing, cell occupied, or AI thinking');
+      return;
+    }
+
+    // Multiplayer mode validation
+    if (isMultiplayerMode) {
+      // Check if game has started
+      if (!gameStarted) {
+        console.log('🚫 MULTIPLAYER: Move blocked - game not started yet');
+        return;
+      }
+      
+      // Check if it's the player's turn
+      if (!isMyTurn) {
+        console.log('🚫 MULTIPLAYER: Move blocked - not your turn');
+        return;
+      }
+      
+      // Check if current player matches my player
+      if (currentPlayer !== myPlayer) {
+        console.log(`🚫 MULTIPLAYER: Move blocked - current player ${currentPlayer} doesn't match my player ${myPlayer}`);
+        return;
+      }
+      
+      console.log(`✅ MULTIPLAYER: Valid move attempt at (${row}, ${col}) by ${myPlayer}`);
+      
+      // Send move to server first
+      multiplayerManager.sendMove(row, col);
+      
+      // Place piece locally
+      placePiece(row, col);
+      return;
+    }
+
+    // AI mode validation
+    if (isAIMode && currentPlayer === 'O') {
+      console.log('🚫 AI: Move blocked - AI turn');
+      return;
+    }
+
+    // Single player or AI mode
+    console.log(`✅ SINGLE: Valid move at (${row}, ${col})`);
+    placePiece(row, col);
   };
 
   const renderCell = (row: number, col: number) => {
@@ -144,6 +235,48 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
                       `PLAYER ${winner} WINS!`
                     }
                   </span>
+                </div>
+              )}
+              
+              {/* Multiplayer Status */}
+              {isMultiplayerMode && (
+                <div className="border-t border-orange-500 pt-2 mt-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    {opponentConnected ? (
+                      <Wifi className="h-4 w-4 text-green-400" />
+                    ) : (
+                      <WifiOff className="h-4 w-4 text-red-400" />
+                    )}
+                    <span className={`text-sm pixel-font ${opponentConnected ? 'text-green-400' : 'text-red-400'}`}>
+                      {opponentConnected ? 'OPPONENT CONNECTED' : 'WAITING FOR OPPONENT'}
+                    </span>
+                  </div>
+                  
+                  <div className="text-xs text-orange-300 pixel-font">
+                    YOU ARE: {myPlayer} ({isHost ? 'HOST' : 'GUEST'})
+                  </div>
+                  
+                  {!gameStarted && isHost && opponentConnected && (
+                    <Button
+                      onClick={() => multiplayerManager.startGame()}
+                      className="w-full mt-2 bg-green-500 hover:bg-green-600 text-black pixel-font text-sm"
+                      size="sm"
+                    >
+                      START GAME
+                    </Button>
+                  )}
+                  
+                  {!gameStarted && !isHost && opponentConnected && (
+                    <div className="text-xs text-yellow-400 pixel-font mt-2 animate-pixel-blink">
+                      WAITING FOR HOST TO START...
+                    </div>
+                  )}
+                  
+                  {gameStarted && (
+                    <div className="text-xs text-green-400 pixel-font mt-2">
+                      YOUR TURN: {isMyTurn ? 'YES' : 'NO'}
+                    </div>
+                  )}
                 </div>
               )}
               
