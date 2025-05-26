@@ -139,9 +139,9 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
                 Pieces: {totalPieces}/9
               </div>
               
-              {totalPieces >= 8 && (
+              {totalPieces >= 5 && (
                 <div className="text-xs text-yellow-400">
-                  Grid full! Oldest pieces will disappear.
+                  Oldest pieces will start disappearing!
                 </div>
               )}
             </div>

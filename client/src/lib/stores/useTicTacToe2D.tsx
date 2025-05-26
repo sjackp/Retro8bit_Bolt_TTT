@@ -26,12 +26,20 @@ interface TicTacToe2DState {
   placementOrder: number;
   isAIMode: boolean;
   isAIThinking: boolean;
+  isMultiplayerMode: boolean;
+  opponentConnected: boolean;
+  isMyTurn: boolean;
+  myPlayer: Player;
   
   // Actions
   placePiece: (row: number, col: number) => void;
   resetGame: () => void;
   switchPlayer: () => void;
   setAIMode: (enabled: boolean) => void;
+  setMultiplayerMode: (enabled: boolean, isHost: boolean) => void;
+  setOpponentConnected: (connected: boolean) => void;
+  setMyTurn: (isMyTurn: boolean) => void;
+  handleOpponentMove: (row: number, col: number) => void;
 }
 
 // Initialize empty 3x3 grid
@@ -99,6 +107,10 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
     placementOrder: 1,
     isAIMode: false,
     isAIThinking: false,
+    isMultiplayerMode: false,
+    opponentConnected: false,
+    isMyTurn: true,
+    myPlayer: 'X',
     
     placePiece: (row: number, col: number) => {
       const state = get();
@@ -130,7 +142,7 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
         });
         
         // Check if we need to remove old pieces (FIFO when grid gets full)
-        if (newTotalPieces > 8) { // Start removing when we have 9 pieces (grid is full)
+        if (newTotalPieces > 5) { // Start removing when we have 6 pieces
           const oldestPiece = newPieceQueue.shift();
           if (oldestPiece) {
             // Start blinking animation for the piece to be removed
