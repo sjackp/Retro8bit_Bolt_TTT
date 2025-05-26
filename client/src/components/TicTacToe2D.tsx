@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
 import { useTicTacToe2D } from "@/lib/stores/useTicTacToe2D";
 import { useAudio } from "@/lib/stores/useAudio";
+import { useGameMode } from "@/lib/stores/useGameMode";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Volume2, VolumeX, RotateCcw } from "lucide-react";
+import { Volume2, VolumeX, RotateCcw, ArrowLeft, Bot, Users } from "lucide-react";
 
-export default function TicTacToe2D() {
+interface TicTacToe2DProps {
+  onBackToMenu: () => void;
+}
+
+export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
   const { 
     grid, 
     currentPlayer, 
@@ -16,9 +21,12 @@ export default function TicTacToe2D() {
     placePiece,
     playerScores,
     totalPieces,
-    pieceQueue 
+    pieceQueue,
+    isAIMode,
+    isAIThinking
   } = useTicTacToe2D();
   
+  const { gameMode, roomCode } = useGameMode();
   const { isMuted, toggleMute, setHitSound, setSuccessSound } = useAudio();
 
   // Initialize audio
@@ -31,7 +39,9 @@ export default function TicTacToe2D() {
   }, [setHitSound, setSuccessSound]);
 
   const handleCellClick = (row: number, col: number) => {
-    if (gamePhase === 'playing' && !grid[row][col].piece) {
+    if (gamePhase === 'playing' && !grid[row][col].piece && !isAIThinking) {
+      // In AI mode, only allow human player (X) to move
+      if (isAIMode && currentPlayer === 'O') return;
       placePiece(row, col);
     }
   };
@@ -97,7 +107,10 @@ export default function TicTacToe2D() {
       <div className="flex justify-between items-center w-full max-w-2xl mb-8">
         <Card className="bg-black/80 backdrop-blur-sm border-gray-700">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg text-white">2D Tic-Tac-Toe</CardTitle>
+            <CardTitle className="text-lg text-white flex items-center gap-2">
+              {isAIMode ? <Bot className="h-5 w-5" /> : <Users className="h-5 w-5" />}
+              {isAIMode ? "vs AI" : gameMode === 'multiplayer' ? `Room: ${roomCode}` : "2D Tic-Tac-Toe"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -105,8 +118,11 @@ export default function TicTacToe2D() {
                 <div className="flex items-center gap-2">
                   <span className="text-white">Current Player:</span>
                   <Badge variant={currentPlayer === 'X' ? "destructive" : "default"}>
-                    {currentPlayer}
+                    {isAIMode ? (currentPlayer === 'X' ? 'You' : 'AI') : currentPlayer}
                   </Badge>
+                  {isAIThinking && currentPlayer === 'O' && (
+                    <span className="text-yellow-400 text-sm animate-pulse">AI thinking...</span>
+                  )}
                 </div>
               )}
               
@@ -136,6 +152,15 @@ export default function TicTacToe2D() {
           <Button
             variant="outline"
             size="icon"
+            onClick={onBackToMenu}
+            className="bg-black/80 backdrop-blur-sm border-gray-700 text-white hover:bg-gray-800"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="icon"
             onClick={toggleMute}
             className="bg-black/80 backdrop-blur-sm border-gray-700 text-white hover:bg-gray-800"
           >
@@ -159,12 +184,12 @@ export default function TicTacToe2D() {
           <div className="flex gap-4 text-center">
             <div>
               <div className="text-2xl font-bold text-red-400">{playerScores.X}</div>
-              <div className="text-sm text-gray-300">Player X</div>
+              <div className="text-sm text-gray-300">{isAIMode ? "You (X)" : "Player X"}</div>
             </div>
             <div className="text-2xl text-gray-500">-</div>
             <div>
               <div className="text-2xl font-bold text-blue-400">{playerScores.O}</div>
-              <div className="text-sm text-gray-300">Player O</div>
+              <div className="text-sm text-gray-300">{isAIMode ? "AI (O)" : "Player O"}</div>
             </div>
           </div>
         </CardContent>
