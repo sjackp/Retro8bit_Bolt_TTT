@@ -61,11 +61,11 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
     }
 
     if (cellData.piece === 'X') {
-      cellContent = "X";
-      cellClass += " text-white bg-red-600 border-red-700";
+      cellContent = "✕";
+      cellClass += " text-white bg-orange-500 border-orange-600";
     } else if (cellData.piece === 'O') {
-      cellContent = "O";
-      cellClass += " text-white bg-blue-600 border-blue-700";
+      cellContent = "◯";
+      cellClass += " text-white bg-purple-500 border-purple-600";
     }
 
     // Apply animations
@@ -193,12 +193,12 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
       <Card className="bg-black border-4 border-orange-500 shadow-lg mb-8 relative z-10">
         <CardContent className="pt-4">
           <div className="flex gap-4 text-center justify-center">
-            <div className="p-4 bg-red-600 border-4 border-red-700">
+            <div className="p-4 bg-orange-500 border-4 border-orange-600">
               <div className="text-3xl font-bold text-white pixel-font">{playerScores.X}</div>
               <div className="text-sm text-white pixel-font">{isAIMode ? "YOU" : "P1"}</div>
             </div>
             <div className="text-2xl text-orange-400 pixel-font self-center animate-retro-glow">VS</div>
-            <div className="p-4 bg-blue-600 border-4 border-blue-700">
+            <div className="p-4 bg-purple-500 border-4 border-purple-600">
               <div className="text-3xl font-bold text-white pixel-font">{playerScores.O}</div>
               <div className="text-sm text-white pixel-font">{isAIMode ? "CPU" : "P2"}</div>
             </div>
@@ -282,10 +282,10 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
 
                     if (!isEmpty) {
                       if (cellData.piece === 'X') {
-                        cellClass += " text-red-400 border-red-500";
+                        cellClass += " text-orange-400 border-orange-500";
                         cellContent = "✕";
                       } else {
-                        cellClass += " text-blue-400 border-blue-500";
+                        cellClass += " text-purple-400 border-purple-500";
                         cellContent = "◯";
                       }
                     }

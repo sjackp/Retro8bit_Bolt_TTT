@@ -15,6 +15,8 @@ interface AudioState {
   toggleMute: () => void;
   playHit: () => void;
   playSuccess: () => void;
+  playPlace: () => void;
+  playRemove: () => void;
 }
 
 export const useAudio = create<AudioState>((set, get) => ({
@@ -69,6 +71,60 @@ export const useAudio = create<AudioState>((set, get) => ({
       successSound.play().catch(error => {
         console.log("Success sound play prevented:", error);
       });
+    }
+  },
+
+  // 8-bit style placement sound
+  playPlace: () => {
+    const { isMuted } = get();
+    if (!isMuted) {
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(660, audioContext.currentTime + 0.1);
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+        
+        oscillator.type = 'square';
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.15);
+      } catch (error) {
+        console.log("8-bit place sound failed:", error);
+      }
+    }
+  },
+
+  // 8-bit style removal sound
+  playRemove: () => {
+    const { isMuted } = get();
+    if (!isMuted) {
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(330, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(110, audioContext.currentTime + 0.2);
+        
+        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+        
+        oscillator.type = 'sawtooth';
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.2);
+      } catch (error) {
+        console.log("8-bit remove sound failed:", error);
+      }
     }
   }
 }));

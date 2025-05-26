@@ -152,7 +152,7 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
         });
       }
       
-      const { playHit, playSuccess } = useAudio.getState();
+      const { playPlace, playSuccess, playRemove } = useAudio.getState();
       
       set((state) => {
         console.log(`\n🎯 PLACING PIECE: ${state.currentPlayer} at (${row}, ${col})`);
