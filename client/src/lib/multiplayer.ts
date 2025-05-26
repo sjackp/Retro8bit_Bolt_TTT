@@ -52,28 +52,38 @@ export class MultiplayerManager {
     });
   }
 
-  createRoom(roomCode: string): Promise<boolean> {
+  createRoom(roomCode: string): Promise<{ success: boolean; error?: string }> {
     return new Promise((resolve) => {
       if (!this.socket) {
-        resolve(false);
+        resolve({ success: false, error: 'Failed to connect to server' });
         return;
       }
 
-      this.socket.emit('create-room', { roomCode }, (response: { success: boolean }) => {
-        resolve(response.success);
+      this.socket.emit('create-room', { roomCode }, (response: { success: boolean; error?: string }) => {
+        if (response.success) {
+          console.log(`✅ Room ${roomCode} created successfully`);
+        } else {
+          console.log(`❌ Failed to create room: ${response.error}`);
+        }
+        resolve(response);
       });
     });
   }
 
-  joinRoom(roomCode: string): Promise<boolean> {
+  joinRoom(roomCode: string): Promise<{ success: boolean; error?: string }> {
     return new Promise((resolve) => {
       if (!this.socket) {
-        resolve(false);
+        resolve({ success: false, error: 'Failed to connect to server' });
         return;
       }
 
-      this.socket.emit('join-room', { roomCode }, (response: { success: boolean }) => {
-        resolve(response.success);
+      this.socket.emit('join-room', { roomCode }, (response: { success: boolean; error?: string }) => {
+        if (response.success) {
+          console.log(`✅ Joined room ${roomCode} successfully`);
+        } else {
+          console.log(`❌ Failed to join room: ${response.error}`);
+        }
+        resolve(response);
       });
     });
   }

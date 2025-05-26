@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Users, Bot, Plus, LogIn } from "lucide-react";
+import { Users, Bot, Plus, LogIn, AlertCircle } from "lucide-react";
+import { multiplayerManager } from "@/lib/multiplayer";
 
 interface GameModeSelectorProps {
   onModeSelect: (mode: 'ai' | 'multiplayer', roomCode?: string, isHost?: boolean) => void;
@@ -14,6 +15,8 @@ export default function GameModeSelector({ onModeSelect }: GameModeSelectorProps
   const [roomCode, setRoomCode] = useState("");
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const [generatedRoomCode, setGeneratedRoomCode] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const generateRoomCode = () => {
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -21,13 +24,43 @@ export default function GameModeSelector({ onModeSelect }: GameModeSelectorProps
     setIsCreatingRoom(true);
   };
 
-  const handleCreateRoom = () => {
-    generateRoomCode();
+  const handleCreateRoom = async () => {
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    setIsLoading(true);
+    setErrorMessage("");
+    
+    try {
+      const result = await multiplayerManager.createRoom(code);
+      if (result.success) {
+        setGeneratedRoomCode(code);
+        setIsCreatingRoom(true);
+      } else {
+        setErrorMessage(result.error || "Failed to create room");
+      }
+    } catch (error) {
+      setErrorMessage("Failed to connect to server");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleJoinRoom = () => {
-    if (roomCode.trim()) {
-      onModeSelect('multiplayer', roomCode.trim(), false);
+  const handleJoinRoom = async () => {
+    if (!roomCode.trim()) return;
+    
+    setIsLoading(true);
+    setErrorMessage("");
+    
+    try {
+      const result = await multiplayerManager.joinRoom(roomCode.trim());
+      if (result.success) {
+        onModeSelect('multiplayer', roomCode.trim(), false);
+      } else {
+        setErrorMessage(result.error || "Failed to join room");
+      }
+    } catch (error) {
+      setErrorMessage("Failed to connect to server");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -50,6 +83,14 @@ export default function GameModeSelector({ onModeSelect }: GameModeSelectorProps
             <CardTitle className="text-2xl text-orange-400 text-center pixel-font animate-retro-glow">MULTIPLAYER</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* Error Message */}
+            {errorMessage && (
+              <div className="p-3 bg-red-900 border-2 border-red-500 rounded flex items-center space-x-2">
+                <AlertCircle className="h-5 w-5 text-red-400" />
+                <span className="text-red-300 pixel-font text-sm">{errorMessage}</span>
+              </div>
+            )}
+            
             {!isCreatingRoom ? (
               <>
                 {/* Create Room */}
@@ -57,11 +98,14 @@ export default function GameModeSelector({ onModeSelect }: GameModeSelectorProps
                   <h3 className="text-lg font-semibold text-orange-400 pixel-font">CREATE ROOM</h3>
                   <Button 
                     onClick={handleCreateRoom}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-black border-2 border-orange-600 pixel-font flex items-center justify-center"
+                    disabled={isLoading}
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-black border-2 border-orange-600 pixel-font flex items-center justify-center disabled:bg-gray-600 disabled:border-gray-700 disabled:text-gray-400"
                     size="lg"
                   >
                     <Plus className="mr-2 h-5 w-5 flex-shrink-0" />
-                    <span className="flex items-center">CREATE NEW ROOM</span>
+                    <span className="flex items-center">
+                      {isLoading ? "CREATING..." : "CREATE NEW ROOM"}
+                    </span>
                   </Button>
                 </div>
 
