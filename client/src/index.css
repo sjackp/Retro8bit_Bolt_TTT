@@ -28,3 +28,41 @@ canvas {
   height: 100% !important;
   touch-action: none;
 }
+
+/* Retro 80s Neon Effects */
+.text-shadow-neon {
+  text-shadow: 
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 15px currentColor,
+    0 0 20px currentColor;
+}
+
+.neon-box {
+  box-shadow: 
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 15px currentColor,
+    inset 0 0 5px currentColor;
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    text-shadow: 
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor,
+      0 0 20px currentColor;
+  }
+  50% {
+    text-shadow: 
+      0 0 2px currentColor,
+      0 0 5px currentColor,
+      0 0 8px currentColor,
+      0 0 12px currentColor;
+  }
+}
+
+.animate-neon {
+  animation: neon-pulse 2s ease-in-out infinite;
+}

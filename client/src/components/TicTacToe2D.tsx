@@ -70,7 +70,7 @@ export default function TicTacToe2D({ onBackToMenu }: TicTacToe2DProps) {
     // Apply animations
     let opacity = 1 - cellData.fadeProgress;
     if (cellData.isBlinking) {
-      cellClass += " animate-pulse";
+      cellClass += " animate-pulse border-yellow-400 bg-yellow-400/20 shadow-lg shadow-yellow-400/50";
     }
 
     const cellStyle = {
