@@ -4,7 +4,7 @@ import { useAudio } from "./useAudio";
 import { getAIMove } from "../aiLogic";
 
 export type Player = 'X' | 'O';
-export type GamePhase = 'playing' | 'ended' | 'draw';
+export type GamePhase = 'placement' | 'movement' | 'ended' | 'draw';
 
 export interface CellData {
   piece: 'X' | 'O' | null;
@@ -22,8 +22,8 @@ interface TicTacToe2DState {
   gamePhase: GamePhase;
   playerScores: { X: number; O: number };
   totalPieces: number;
-  pieceQueue: Array<{ row: number; col: number; player: Player; order: number }>;
-  placementOrder: number;
+  pieceCount: { X: number; O: number };
+  selectedPiece: { row: number; col: number } | null;
   isAIMode: boolean;
   isAIThinking: boolean;
   isMultiplayerMode: boolean;
@@ -33,6 +33,8 @@ interface TicTacToe2DState {
   
   // Actions
   placePiece: (row: number, col: number) => void;
+  movePiece: (fromRow: number, fromCol: number, toRow: number, toCol: number) => void;
+  selectPiece: (row: number, col: number) => void;
   resetGame: () => void;
   switchPlayer: () => void;
   setAIMode: (enabled: boolean) => void;
@@ -100,11 +102,11 @@ export const useTicTacToe2D = create<TicTacToe2DState>()(
     grid: createEmptyGrid(),
     currentPlayer: 'X',
     winner: null,
-    gamePhase: 'playing',
+    gamePhase: 'placement',
     playerScores: { X: 0, O: 0 },
     totalPieces: 0,
-    pieceQueue: [],
-    placementOrder: 1,
+    pieceCount: { X: 0, O: 0 },
+    selectedPiece: null,
     isAIMode: false,
     isAIThinking: false,
     isMultiplayerMode: false,
